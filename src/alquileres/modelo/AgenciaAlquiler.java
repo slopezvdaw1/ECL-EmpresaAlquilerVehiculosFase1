@@ -1,8 +1,13 @@
+package alquileres.modelo;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * La clase guarda en una colección List (un ArrayList) la flota de vehículos
@@ -10,6 +15,7 @@ import java.util.Set;
  * 
  * Los vehículos se modelan como un interface List que se instanciará como una
  * colección concreta ArrayList
+ * @author - Sara L�pez Vicente
  */
 public class AgenciaAlquiler {
 	private String nombre; // el nombre de la agencia
@@ -29,8 +35,10 @@ public class AgenciaAlquiler {
 	 * añade un nuevo vehículo solo si no existe
 	 * 
 	 */
-	public void addVehiculo() {
-
+	public void addVehiculo(Vehiculo v) {
+		if (!flota.contains(v)) {
+			flota.add(v);
+		}
 	}
 
 	/**
@@ -45,9 +53,23 @@ public class AgenciaAlquiler {
 	 * Asumimos todos los datos correctos. Puede haber espacios antes y después
 	 * de cada dato
 	 */
-	private Vehiculo obtenerVehiculo() {
-
-		return null;
+	private Vehiculo obtenerVehiculo(String linea) {
+		String[] datos = linea.split(",");
+		for (String dato: datos) {
+			dato.trim();
+		}
+		String matricula = datos[1];
+		String marca = datos[2];
+		String modelo = datos[3];
+		double precio = Double.parseDouble(datos[4]);
+		if (datos[0].equals("C")) {
+			int plazas = Integer.parseInt(datos[5]);
+			Coche c = new Coche(matricula, marca, modelo, precio, plazas);
+			return c;
+		}
+		double vol = Double.parseDouble(datos[5]);
+		Furgoneta furgo = new Furgoneta(matricula, marca, modelo, precio, vol);
+		return furgo;
 	}
 
 	/**
@@ -76,8 +98,14 @@ public class AgenciaAlquiler {
 	 */
 	@Override
 	public String toString() {
-
-		return null;
+		StringBuilder sb = new StringBuilder();
+		sb.append("Veh�culos en alquiler de la agencia " + nombre + "\n");
+		sb.append("\nTotal veh�culos: " + flota.size());
+		for (Vehiculo v: flota) {
+			sb.append("\n" + v.toString() 
+			+ "\n\n-----------------------------------------------------");
+		}
+		return sb.toString();
 
 	}
 
@@ -87,9 +115,16 @@ public class AgenciaAlquiler {
 	 * costaría alquilar cada coche el nº de días indicado * 
 	 *  
 	 */
-	public String buscarCoches() {
-
-		return null;
+	public String buscarCoches(int dias) {
+		StringBuilder sb = new StringBuilder();
+		for (Vehiculo v: flota) {
+			if (v instanceof Coche) {
+				sb.append(v.toString());
+				sb.append("\nCoste alquiler " + dias + "d�as: " + v.calcularPrecioAlquiler(dias) + "�"
+						+ "\n---------------");
+			}
+		}
+		return sb.toString();
 
 	}
 
@@ -99,8 +134,16 @@ public class AgenciaAlquiler {
 	 * 
 	 */
 	public List<Coche> cochesOrdenadosMatricula() {
-
-		return null;
+		ArrayList<Coche> ordenados = new ArrayList<>();
+		Iterator<Vehiculo> it = flota.iterator();
+		while (it.hasNext()) {
+			Vehiculo v = it.next();
+			if ((v instanceof Coche) && ((Coche) v).getNumeroPlazas() > 4) {
+				ordenados.add((Coche) v);
+			}
+		}
+		Collections.sort(ordenados);
+		return ordenados;
 	}
 
 	/**
@@ -109,8 +152,15 @@ public class AgenciaAlquiler {
 	 * 
 	 */
 	public List<Furgoneta> furgonetasOrdenadasPorVolumen() {
-
-		return null;
+		ArrayList<Furgoneta> ordenadas = new ArrayList<>();
+		Iterator<Vehiculo> it = flota.iterator();
+		while (it.hasNext()) {
+			Vehiculo v = it.next();
+			if (v instanceof Furgoneta) {
+				ordenadas.add((Furgoneta) v);
+			}
+		}
+		return ordenadas;
 
 	}
 
@@ -120,8 +170,20 @@ public class AgenciaAlquiler {
 	 * de los modelos en cada marca como valor asociado
 	 */
 	public Map<String, Set<String>> marcasConModelos() {
-
-		return null;
+		Map<String, Set<String>> mapa = new TreeMap<String, Set<String>>();
+		for (Vehiculo v: flota) {
+			String marca = v.getMarca();
+			String modelo = v.getModelo();
+			if (mapa.containsKey(marca)) {
+				mapa.get(marca).add(modelo);
+			}
+			else {
+				TreeSet<String> modelos = new TreeSet<String>();
+				modelos.add(modelo);
+				mapa.put(marca, modelos);
+			}
+		}
+		return mapa;
 	}
 
 }

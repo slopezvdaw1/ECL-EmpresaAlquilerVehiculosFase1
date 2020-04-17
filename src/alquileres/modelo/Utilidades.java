@@ -1,3 +1,4 @@
+package alquileres.modelo;
 
 
 public class Utilidades {
