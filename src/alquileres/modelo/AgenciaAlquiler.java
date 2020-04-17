@@ -2,6 +2,7 @@ package alquileres.modelo;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -160,6 +161,17 @@ public class AgenciaAlquiler {
 				ordenadas.add((Furgoneta) v);
 			}
 		}
+		Collections.sort(ordenadas, new Comparator<Furgoneta>()	{
+			public int compare(Furgoneta f1, Furgoneta f2) {
+				if (f1.getVolumen() == f2.getVolumen()) {
+					return 0;
+				}
+				if (f1.getVolumen() > f2.getVolumen()) {
+					return 1;
+				}
+				return 0;
+			}
+		});
 		return ordenadas;
 
 	}
